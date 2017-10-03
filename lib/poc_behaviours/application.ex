@@ -9,7 +9,9 @@ defmodule PocBehaviours.Application do
     # Listado de todos los procesos que son supervisados
     #directamente por PocBehaviours.Application
     children = [
-      # {PocBehaviours.Worker, arg},
+      PocBehaviours.VentanillaSupervisor,
+      PocBehaviours.RegistroAgent
+
     ]
     #Opciones de configuración de la supervisión
     #Estrategias indican como se debe actuar cuando

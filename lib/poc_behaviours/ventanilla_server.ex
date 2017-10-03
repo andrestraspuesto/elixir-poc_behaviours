@@ -6,12 +6,13 @@ defmodule PocBehaviours.VentanillaServer do
   consiste en atender las peticiones de una
   tramitación electrónica.
   """
-  defmodule Tramitacion do
-    defstruct [pid_reglas: nil, gestor_reglas: nil, nombre: nil, email: nil]
-  end
+  alias PocBehaviours.{Tramitacion, RegistroAgent}
 
   @arbitro PocBehaviours.GestorReglas
 
+  @doc """
+  Inicia un proceso y asigna el nombre en el estado
+  """
   def start_link(nombre, opts \\ []) do
     gestor_reglas = opts[:gestorReglas] || @arbitro
     {:ok, pid_reglas} = gestor_reglas.start_link()
@@ -21,17 +22,32 @@ defmodule PocBehaviours.VentanillaServer do
 
   #API
 
-
+  @doc """
+  Añade el email a la información de  la tramitación
+  """
   def cumplimentar(pid, email) do
     GenServer.call(pid, {:cumplimentar, email})
   end
 
+  @doc """
+  pasa a estado solicitar
+  """
   def solicitar(pid) do
     GenServer.call(pid, {:solicitar})
   end
 
+  @doc """
+  Renuncia al trámite
+  """
   def renunciar(pid) do
     GenServer.call(pid, {:renunciar})
+  end
+
+  @doc """
+  Detiene el proceso
+  """
+  def detener(pid) do
+    GenServer.cast(pid, :stop)
   end
 
   #Callbacks
@@ -50,6 +66,8 @@ defmodule PocBehaviours.VentanillaServer do
   def handle_call({:solicitar}, _from, estado_tramite) do
     case validar_accion(estado_tramite, :solicitar) do
       :ok ->
+        RegistroAgent.put(estado_tramite)
+
         {:reply, {:ok, "solicitado"}, estado_tramite}
         _ ->
           {:reply, {:ok, "no se pudo solicitar"}, estado_tramite}
@@ -64,6 +82,10 @@ defmodule PocBehaviours.VentanillaServer do
         _ ->
           {:reply, {:ok, "no se pudo renunciar"}, estado_tramite}
     end
+  end
+
+  def handle_cast(:stop, estado_tramite) do
+    {:stop, :normal, estado_tramite}
   end
 
   def handle_info(_, state) do
