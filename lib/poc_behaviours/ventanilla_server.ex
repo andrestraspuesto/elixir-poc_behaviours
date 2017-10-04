@@ -16,8 +16,9 @@ defmodule PocBehaviours.VentanillaServer do
   def start_link(nombre, opts \\ []) do
     gestor_reglas = opts[:gestorReglas] || @arbitro
     {:ok, pid_reglas} = gestor_reglas.start_link()
-    tramite = %Tramitacion{pid_reglas: pid_reglas, gestor_reglas: gestor_reglas, nombre: nombre}
-    GenServer.start_link(__MODULE__, tramite)
+    tramite = %Tramitacion{nombre: nombre}
+    estado = %{pid_reglas: pid_reglas, gestor_reglas: gestor_reglas, tramite: tramite}
+    GenServer.start_link(__MODULE__, estado)
   end
 
   #API
@@ -55,7 +56,8 @@ defmodule PocBehaviours.VentanillaServer do
   def handle_call({:cumplimentar, email}, _from, estado_tramite) do
     case validar_accion(estado_tramite, :cumplimentar) do
       :ok ->
-        nuevo_estado = %Tramitacion{estado_tramite | email: email}
+        tramite = %Tramitacion{estado_tramite.tramite | email: email}
+        nuevo_estado = Map.replace(estado_tramite, :tramite, tramite)
         {:reply, {:ok, "Cumplimentado Email: #{email}"}, nuevo_estado}
       _ ->
         {:reply, {:ok, "no se pudo cumplimentar"}, estado_tramite}
@@ -66,7 +68,7 @@ defmodule PocBehaviours.VentanillaServer do
   def handle_call({:solicitar}, _from, estado_tramite) do
     case validar_accion(estado_tramite, :solicitar) do
       :ok ->
-        RegistroAgent.put(estado_tramite)
+        RegistroAgent.put(estado_tramite.tramite)
 
         {:reply, {:ok, "solicitado"}, estado_tramite}
         _ ->

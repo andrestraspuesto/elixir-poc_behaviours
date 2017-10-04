@@ -1,0 +1,5 @@
+iex> alias PocBehaviours.{VentanillaSupervisor, VentanillaServer, RegistroAgent}
+iex> {:ok, pid} = VentanillaSupervisor.abre_ventanilla("pepe")
+iex> VentanillaServer.cumplimentar(pid, "aaa@aa.es")
+iex> VentanillaServer.solicitar(pid)
+iex> RegistroAgent.get("pepe")
