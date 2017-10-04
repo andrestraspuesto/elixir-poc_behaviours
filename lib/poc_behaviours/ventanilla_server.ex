@@ -6,18 +6,25 @@ defmodule PocBehaviours.VentanillaServer do
   consiste en atender las peticiones de una
   tramitación electrónica.
   """
-  alias PocBehaviours.{Tramitacion, RegistroAgent}
+  alias PocBehaviours.Tramitacion
 
   @arbitro PocBehaviours.GestorReglas
+
 
   @doc """
   Inicia un proceso y asigna el nombre en el estado
   """
-  def start_link(nombre, opts \\ []) do
-    gestor_reglas = opts[:gestorReglas] || @arbitro
+  def start_link(nombre, opts \\ %{}) do
+    gestor_reglas = opts[:gestor_reglas] || @arbitro
+    solicitado_handler = opts[:solicitado_handler] || fn (a) -> a end
     {:ok, pid_reglas} = gestor_reglas.start_link()
     tramite = %Tramitacion{nombre: nombre}
-    estado = %{pid_reglas: pid_reglas, gestor_reglas: gestor_reglas, tramite: tramite}
+    estado = %{
+      pid_reglas: pid_reglas,
+      gestor_reglas: gestor_reglas,
+      solicitado_handler: solicitado_handler,
+      tramite: tramite
+    }
     GenServer.start_link(__MODULE__, estado)
   end
 
@@ -68,8 +75,8 @@ defmodule PocBehaviours.VentanillaServer do
   def handle_call({:solicitar}, _from, estado_tramite) do
     case validar_accion(estado_tramite, :solicitar) do
       :ok ->
-        RegistroAgent.put(estado_tramite.tramite)
-
+        #RegistroAgent.put(estado_tramite.tramite)
+        estado_tramite.solicitado_handler.(estado_tramite.tramite)
         {:reply, {:ok, "solicitado"}, estado_tramite}
         _ ->
           {:reply, {:ok, "no se pudo solicitar"}, estado_tramite}

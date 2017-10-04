@@ -10,7 +10,8 @@ defmodule PocBehaviours.VentanillaSupervisor do
   end
 
   def abre_ventanilla(nombre) do
-    Supervisor.start_child(__MODULE__, [nombre])
+    Supervisor.start_child(__MODULE__,
+    [nombre,%{solicitado_handler: &PocBehaviours.RegistroAgent.put/1}])
   end
 
   def init(:ok) do

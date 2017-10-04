@@ -18,7 +18,8 @@ defmodule PocBehaviours.GestorReglas do
 
   @doc """
   Inicia un proceso GestorReglas en estado iniciado
-  ##Ejemplo:
+
+  ## Ejemplo:
       iex>{:ok, pid} = PocBehaviours.GestorReglas.start_link()
       iex>PocBehaviours.GestorReglas.ver_estado(pid)
       :iniciado
@@ -29,6 +30,7 @@ defmodule PocBehaviours.GestorReglas do
 
   @doc """
   Inicia un proceso GestorReglas en estado distinto a iniciado
+
   ##Ejemplo:
       iex>{:ok, pid} = PocBehaviours.GestorReglas.start_link(:cumplimentado)
       iex>PocBehaviours.GestorReglas.ver_estado(pid)
@@ -41,6 +43,7 @@ defmodule PocBehaviours.GestorReglas do
   @doc """
   Cambia al estado cumplimentado si está en estado iniciado
   o cumplimentado
+
   ##Ejemplo:
       iex>{:ok, pid} = PocBehaviours.GestorReglas.start_link()
       iex>PocBehaviours.GestorReglas.cumplimentar(pid)
@@ -62,6 +65,7 @@ defmodule PocBehaviours.GestorReglas do
 
   @doc """
   Cambia al estado solicitado si está en estado cumplimentado
+
   ##Ejemplo:
       iex>{:ok, pid} = PocBehaviours.GestorReglas.start_link(:cumplimentado)
       iex>PocBehaviours.GestorReglas.solicitar(pid)
@@ -83,6 +87,7 @@ defmodule PocBehaviours.GestorReglas do
   @doc """
   Cambia al estado renunciado desde cualquier estado
   excepto si ya está renunciado
+
   ##Ejemplo:
       iex>{:ok, pid} = PocBehaviours.GestorReglas.start_link(:cumplimentado)
       iex>PocBehaviours.GestorReglas.renunciar(pid)
@@ -106,6 +111,7 @@ defmodule PocBehaviours.GestorReglas do
 
   @doc """
   Devuelve el estado en que se encuentra el trámite
+
   ##Ejemplo:
       iex>{:ok, pid} = PocBehaviours.GestorReglas.start_link(:cumplimentado)
       iex>PocBehaviours.GestorReglas.ver_estado(pid)

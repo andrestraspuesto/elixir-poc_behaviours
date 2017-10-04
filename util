@@ -3,3 +3,9 @@ iex> {:ok, pid} = VentanillaSupervisor.abre_ventanilla("pepe")
 iex> VentanillaServer.cumplimentar(pid, "aaa@aa.es")
 iex> VentanillaServer.solicitar(pid)
 iex> RegistroAgent.get("pepe")
+
+#handler_especial
+iex> handler = fn(a) -> a.nombre |> IO.puts end
+iex> {:ok, pid} = VentanillaServer.start_link("juan", %{solicitado_handler: handler})
+iex> VentanillaServer.cumplimentar(pid, "aaa@aa.es")
+iex> VentanillaServer.solicitar(pid)
